@@ -2,5 +2,19 @@
 name = "git-flow"
 version = "0.1.0"
 edition = "2021"
+authors = ["niuiic"]
+keywords = ["git flow"]
+homepage = "https://github.com/niuiic/git-flow.rs"
+repository = "https://github.com/niuiic/git-flow.rs"
+categories = ["command-line-utilities"]
+license = "MIT"
+
+[[bin]]
+name = "git-flow"
+path = "src/main.rs"
 
 [dependencies]
+serde = { version = "1.0.192", features = ["derive"] }
+serde_json = "1.0.108"
+regex = "1.10.2"
+anyhow = "1.0.75"

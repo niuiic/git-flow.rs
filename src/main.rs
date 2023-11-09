@@ -1,3 +1,6 @@
+mod config;
+mod git;
+
 fn main() {
-    println!("Hello, world!");
+    unimplemented!();
 }

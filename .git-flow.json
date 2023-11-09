@@ -1,0 +1,13 @@
+[
+  {
+    "type": "feature",
+    "name": "feat/{new_branch}",
+    "from": "dev",
+    "to": [
+      {
+        "branch": "dev",
+        "strategy": "merge"
+      }
+    ]
+  }
+]
