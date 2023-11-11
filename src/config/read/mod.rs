@@ -4,6 +4,9 @@ use anyhow::{bail, Result};
 
 use super::{definition, path};
 
+#[cfg(test)]
+mod test;
+
 pub fn read_config() -> Result<Vec<definition::Config>> {
     let config_path_list = path::get_config_path_list()?;
 
