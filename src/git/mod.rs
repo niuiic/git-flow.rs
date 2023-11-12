@@ -1,4 +1,7 @@
-use std::process::Command;
+use std::{
+    io::{self, Write},
+    process::Command,
+};
 
 use anyhow::{bail, Ok, Result};
 
@@ -101,6 +104,23 @@ impl Git {
             .filter(|x| *x != "")
             .map(|x| x.to_string())
             .collect::<Vec<String>>())
+    }
+
+    /// output commits on source_branch but not on target_branch
+    pub fn diff_logs(source_branch: &str, target_branch: &str) -> Result<()> {
+        let output = Command::new("git")
+            .args([
+                "log",
+                "--color",
+                &format!("{}..{}", target_branch, source_branch),
+            ])
+            .output()?;
+        if !output.status.success() {
+            bail!(String::from_utf8(output.stderr).unwrap());
+        }
+
+        io::stdout().write_all(&output.stdout)?;
+        Ok(())
     }
 
     pub fn get_branches() -> Result<Vec<String>> {

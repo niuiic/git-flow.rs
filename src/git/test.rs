@@ -54,3 +54,8 @@ fn get_branches_t() {
     let result = Git::get_branches().unwrap();
     assert_eq!(result.iter().find(|x| x.as_str() == "main").is_some(), true);
 }
+
+#[test]
+fn diff_logs() {
+    Git::diff_logs("main", "main").unwrap();
+}
