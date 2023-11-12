@@ -8,13 +8,14 @@ mod test;
 impl Cli {
     pub fn help(config_list: &Vec<Config>) {
         println!("Extensible git flow written in rust.\n");
-        println!("Usage: git-flow <subcommand> <options>\n");
-        println!("Avaliable subcommands:\n");
+        println!("Usage: git-flow <command>\n");
+        println!("Avaliable commands:\n");
         println!("-h, --help\n\tPrint help");
+        println!("-v, --version\n\tPrint version");
         println!("start [<branch_type> <branch_name>]/[<full_branch_name>]\n\tstart a task");
         println!("finish [<branch_type> <branch_name>]/[<full_branch_name>]\n\tfinish a task");
-        println!("continue\n\tContinue unfinished task");
         println!("drop [<branch_type> <branch_name>]/[<full_branch_name>]\n\tgive up a task");
+        println!("continue\n\tContinue unfinished task");
         if config_list.len() > 0 {
             println!("\nConfigured branch types:\n");
             config_list.iter().for_each(|config| {
