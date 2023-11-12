@@ -22,6 +22,11 @@ fn main() {
 
     let args = &env::args().collect::<Vec<String>>()[1..];
 
+    if args.get(0).is_none() {
+        Cli::help(&config_list);
+        return;
+    }
+
     match args[0].as_str() {
         "-h" | "--help" => Cli::help(&config_list),
         "-v" | "--version" => Cli::version(),
