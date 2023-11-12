@@ -19,7 +19,17 @@ impl Cli {
         if config_list.len() > 0 {
             println!("\nConfigured branch types:\n");
             config_list.iter().for_each(|config| {
-                println!("\t{}", config.branch_type);
+                println!(
+                    "{}\n\tfrom {} to {}",
+                    config.branch_type,
+                    config.source_branch,
+                    config
+                        .target_branches
+                        .iter()
+                        .map(|x| x.name.to_string())
+                        .collect::<Vec<String>>()
+                        .join(",")
+                );
             });
         } else {
             Echo::warn("No configured branch type found");
