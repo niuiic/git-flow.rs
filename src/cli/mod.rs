@@ -106,13 +106,13 @@ impl Cli {
         let result = Git::diff_commits(&branch_name, &config.source_branch).unwrap();
         if result.is_empty() {
             Echo::info(&format!(
-                "No commits ahead of {} on {}",
+                "No commits ahead of the source branch {} on {}",
                 config.source_branch, &branch_name,
             ));
             return;
         }
         Echo::info(&format!(
-            "These commits are ahead of {}",
+            "These commits are ahead of the source branch {}:\n",
             config.source_branch,
         ));
         Git::diff_logs(&branch_name, &config.source_branch).unwrap();
