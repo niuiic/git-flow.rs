@@ -42,6 +42,7 @@ fn main() {
             .unwrap();
             Cli::start(&config_list, &branch_type, &branch_name);
         }
+        "finish" => {}
         "drop" => {
             if args.len() == 1 {
                 Echo::error("No enough arguments");
@@ -53,6 +54,18 @@ fn main() {
             )
             .unwrap();
             Cli::drop(&config_list, &branch_type, &branch_name);
+        }
+        "track" => {
+            if args.len() == 1 {
+                Echo::error("No enough arguments");
+                return;
+            }
+            let (branch_type, branch_name) = get_branch_type_name(
+                &config_list,
+                &args[1..].iter().map(|x| x.to_string()).collect(),
+            )
+            .unwrap();
+            Cli::track(&config_list, &branch_type, &branch_name);
         }
         _ => Cli::help(&config_list),
     }

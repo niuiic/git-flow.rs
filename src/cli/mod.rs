@@ -15,6 +15,7 @@ impl Cli {
         println!("start [<branch_type> <branch_name>]/[<full_branch_name>]\n\tstart a task");
         println!("finish [<branch_type> <branch_name>]/[<full_branch_name>]\n\tfinish a task");
         println!("drop [<branch_type> <branch_name>]/[<full_branch_name>]\n\tgive up a task");
+        println!("track [<branch_type> <branch_name>]/[<full_branch_name>]\n\ttrack a task");
         println!("continue\n\tContinue unfinished task");
         if config_list.len() > 0 {
             println!("\nConfigured branch types:\n");
@@ -93,5 +94,27 @@ impl Cli {
         Echo::success(&format!("Switch to branch {}", &config.source_branch));
         Git::del_branch(&branch_name).unwrap();
         Echo::success(&format!("Delete branch {}", &branch_name));
+    }
+
+    pub fn track(config_list: &Vec<Config>, branch_type: &str, branch_name: &str) {
+        let config = config_list
+            .iter()
+            .find(|x| x.branch_type == branch_type)
+            .unwrap();
+
+        let branch_name = config.branch_name.replace("{new_branch}", branch_name);
+        let result = Git::diff_commits(&branch_name, &config.source_branch).unwrap();
+        if result.is_empty() {
+            Echo::info(&format!(
+                "No commits ahead of {} on {}",
+                config.source_branch, &branch_name,
+            ));
+            return;
+        }
+        Echo::info(&format!(
+            "These commits are ahead of {}",
+            config.source_branch,
+        ));
+        Git::diff_logs(&branch_name, &config.source_branch).unwrap();
     }
 }
