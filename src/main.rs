@@ -36,20 +36,24 @@ fn main() {
                 return;
             }
 
-            let (branch_type, branch_name) = get_branch_type_name(
+            match get_branch_type_name(
                 &config_list,
                 &args[1..].iter().map(|x| x.to_string()).collect(),
-            )
-            .unwrap();
-
-            if args[0].as_str() == "start" {
-                Cli::start(&config_list, &branch_type, &branch_name);
-            } else if args[0].as_str() == "finish" {
-                Cli::finish(&config_list, &branch_type, &branch_name);
-            } else if args[0].as_str() == "drop" {
-                Cli::drop(&config_list, &branch_type, &branch_name);
-            } else if args[0].as_str() == "track" {
-                Cli::track(&config_list, &branch_type, &branch_name);
+            ) {
+                Ok((branch_type, branch_name)) => {
+                    if args[0].as_str() == "start" {
+                        Cli::start(&config_list, &branch_type, &branch_name);
+                    } else if args[0].as_str() == "finish" {
+                        Cli::finish(&config_list, &branch_type, &branch_name);
+                    } else if args[0].as_str() == "drop" {
+                        Cli::drop(&config_list, &branch_type, &branch_name);
+                    } else if args[0].as_str() == "track" {
+                        Cli::track(&config_list, &branch_type, &branch_name);
+                    }
+                }
+                Err(err) => {
+                    Echo::error(&err.to_string());
+                }
             }
         }
         _ => Cli::help(&config_list),

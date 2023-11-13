@@ -65,7 +65,7 @@ impl Git {
 
     pub fn del_branch(target_branch: &str) -> Result<()> {
         let output = Command::new("git")
-            .args(["branch", "-d", target_branch])
+            .args(["branch", "-D", target_branch])
             .output()?;
         if output.status.success() {
             Ok(())

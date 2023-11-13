@@ -75,6 +75,7 @@ impl Cli {
         if let Err(err) = Git::create_branch(&config.source_branch, &branch_name) {
             println!();
             Echo::error(&err.to_string());
+            return;
         };
         print!("\r");
         Echo::success(&format!("Create new branch {}", &branch_name));
@@ -83,6 +84,7 @@ impl Cli {
         if let Err(err) = Git::switch(&branch_name) {
             println!();
             Echo::error(&err.to_string());
+            return;
         };
         print!("\r");
         Echo::success(&format!("Switch to branch {}", &branch_name));
@@ -110,6 +112,7 @@ impl Cli {
         if let Err(err) = Git::switch(&config.source_branch) {
             println!();
             Echo::error(&err.to_string());
+            return;
         };
         print!("\r");
         Echo::success(&format!("Switch to branch {}", &config.source_branch));
@@ -118,6 +121,7 @@ impl Cli {
         if let Err(err) = Git::del_branch(&branch_name) {
             println!();
             Echo::error(&err.to_string());
+            return;
         }
         print!("\r");
         Echo::success(&format!("Delete branch {}", &branch_name));
