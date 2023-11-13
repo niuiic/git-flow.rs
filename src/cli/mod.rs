@@ -167,16 +167,24 @@ impl Cli {
         let branch_name = config.branch_name.replace("{new_branch}", branch_name);
 
         let branches = Git::get_branches().unwrap();
+        let mut work_branches: Vec<String> = config
+            .target_branches
+            .iter()
+            .map(|x| x.name.to_string())
+            .collect();
+        work_branches.push(config.source_branch.clone());
+        work_branches.push(branch_name.clone());
+        let missing_branches: Vec<String> = work_branches
+            .iter()
+            .filter(|x| branches.iter().find(|y| y.as_str() == x.as_str()).is_none())
+            .map(|x| x.to_string())
+            .collect();
+        if missing_branches.len() > 0 {
+            Echo::error(&format!("Branch {} not found.", missing_branches.join(",")));
+            return;
+        }
 
         for target in &config.target_branches {
-            // if branches
-            //     .iter()
-            //     .find(|x| x.as_str() == branch_name)
-            //     .is_none()
-            // {
-            //     Echo::error(&format!("Target branch {} not found", branch_name));
-            //     return;
-            // }
             match target.strategy {
                 Strategy::Merge => {
                     Echo::progress(&format!("Merge {} into {}", &branch_name, &target.name));
@@ -219,15 +227,50 @@ impl Cli {
                     Echo::success(&format!("Rebase {} onto {}", &target.name, &branch_name));
                 }
                 Strategy::CherryPick => {
-                    // TODO: cherry pick (niuiic)
+                    let commits = Git::diff_commits(&branch_name, &target.name).unwrap();
+                    if commits.len() == 0 {
+                        Echo::warn(&format!("No commits to cherry pick to {}", &target.name));
+                        continue;
+                    }
+
+                    let info = if commits.len() == 1 {
+                        format!("Cherry pick commits {} to {}", &commits[0], &target.name)
+                    } else {
+                        format!(
+                            "Cherry pick commits {}..{} to {}",
+                            &commits[0],
+                            &commits.last().unwrap(),
+                            &target.name
+                        )
+                    };
+
+                    Echo::progress(&info);
+                    if let Err(err) = Git::switch(&target.name) {
+                        println!();
+                        Echo::error(&err.to_string());
+                        return;
+                    };
+                    if let Err(err) = Git::cherry_pick(commits) {
+                        println!();
+                        Echo::error(&err.to_string());
+                        return;
+                    };
+                    print!("\r");
+                    Echo::success(&info);
                 }
             }
         }
 
         Echo::progress(&format!("Delete branch {}", &branch_name));
+        if let Err(err) = Git::switch(&config.source_branch) {
+            println!();
+            Echo::error(&err.to_string());
+            return;
+        };
         if let Err(err) = Git::del_branch(&branch_name) {
             println!();
             Echo::error(&err.to_string());
+            return;
         };
         print!("\r");
         Echo::success(&format!("Delete branch {}", &branch_name));

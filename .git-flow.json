@@ -6,7 +6,7 @@
     "to": [
       {
         "branch": "dev",
-        "strategy": "merge"
+        "strategy": "cherry-pick"
       }
     ]
   }

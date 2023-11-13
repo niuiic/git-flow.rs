@@ -25,6 +25,6 @@ pub enum Strategy {
     Merge,
     #[serde(rename = "rebase")]
     Rebase,
-    #[serde(rename = "check-pick")]
+    #[serde(rename = "cherry-pick")]
     CherryPick,
 }
