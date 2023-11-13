@@ -9,6 +9,7 @@ repository = "https://github.com/niuiic/git-flow.rs"
 categories = ["command-line-utilities"]
 license = "MIT"
 build = "build.rs"
+description = "Extensible git flow written in rust."
 
 [[bin]]
 name = "git-flow"
