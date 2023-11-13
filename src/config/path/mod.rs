@@ -44,11 +44,11 @@ fn get_local_config_path() -> Result<String> {
 pub fn get_config_path_list() -> Result<Vec<String>> {
     let mut path_list = Vec::<String>::new();
 
-    let global_config_path = get_global_config_path()?;
-    path_list.push(global_config_path);
-
     let local_config_path = get_local_config_path()?;
     path_list.push(local_config_path);
+
+    let global_config_path = get_global_config_path()?;
+    path_list.push(global_config_path);
 
     Ok(path_list)
 }
