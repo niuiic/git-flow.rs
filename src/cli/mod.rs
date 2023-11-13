@@ -238,7 +238,7 @@ impl Cli {
                     }
 
                     let info = if commits.len() == 1 {
-                        format!("Cherry pick commits {} to {}", &commits[0], &target.name)
+                        format!("Cherry pick commit {} to {}", &commits[0], &target.name)
                     } else {
                         format!(
                             "Cherry pick commits {}..{} to {}",
