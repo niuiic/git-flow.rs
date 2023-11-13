@@ -2,7 +2,7 @@
 name = "git-flow"
 version = "0.1.0"
 edition = "2021"
-authors = ["niuiic"]
+authors = ["niuiic <niuiicde@gmail.com>"]
 keywords = ["git flow"]
 homepage = "https://github.com/niuiic/git-flow.rs"
 repository = "https://github.com/niuiic/git-flow.rs"
