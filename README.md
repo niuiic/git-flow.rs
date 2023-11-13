@@ -2,6 +2,13 @@
 
 Extensible git flow written in rust.
 
+## Installation
+
+```sh
+cargo install git-flow-rs
+# or download the released executable file.
+```
+
 ## Usage
 
 `git-flow --help`
@@ -53,7 +60,7 @@ git-flow finish feature/something
 
 Global config file should located at `~/.config/git-flow/.git-flow.json`(or `C:\Users\YourUsername\AppData\Roaming\git-flow\.git-flow.json` on windows).
 
-Local config file should located at `<git root>/.git-flow.json`.
+Local config file should located at `<GitRoot>/.git-flow.json`.
 
 There is no default configuration builtin. Here is an example.
 
