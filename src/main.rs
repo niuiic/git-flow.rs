@@ -30,42 +30,27 @@ fn main() {
     match args[0].as_str() {
         "-h" | "--help" => Cli::help(&config_list),
         "-v" | "--version" => Cli::version(),
-        "start" => {
+        "start" | "finish" | "drop" | "track" => {
             if args.len() == 1 {
                 Echo::error("No enough arguments");
                 return;
             }
+
             let (branch_type, branch_name) = get_branch_type_name(
                 &config_list,
                 &args[1..].iter().map(|x| x.to_string()).collect(),
             )
             .unwrap();
-            Cli::start(&config_list, &branch_type, &branch_name);
-        }
-        "finish" => {}
-        "drop" => {
-            if args.len() == 1 {
-                Echo::error("No enough arguments");
-                return;
+
+            if args[0].as_str() == "start" {
+                Cli::start(&config_list, &branch_type, &branch_name);
+            } else if args[0].as_str() == "finish" {
+                Cli::finish(&config_list, &branch_type, &branch_name);
+            } else if args[0].as_str() == "drop" {
+                Cli::drop(&config_list, &branch_type, &branch_name);
+            } else if args[0].as_str() == "track" {
+                Cli::track(&config_list, &branch_type, &branch_name);
             }
-            let (branch_type, branch_name) = get_branch_type_name(
-                &config_list,
-                &args[1..].iter().map(|x| x.to_string()).collect(),
-            )
-            .unwrap();
-            Cli::drop(&config_list, &branch_type, &branch_name);
-        }
-        "track" => {
-            if args.len() == 1 {
-                Echo::error("No enough arguments");
-                return;
-            }
-            let (branch_type, branch_name) = get_branch_type_name(
-                &config_list,
-                &args[1..].iter().map(|x| x.to_string()).collect(),
-            )
-            .unwrap();
-            Cli::track(&config_list, &branch_type, &branch_name);
         }
         _ => Cli::help(&config_list),
     }

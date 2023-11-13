@@ -1,4 +1,9 @@
-use crate::{built_info, config::definition::Config, echo::Echo, git::Git};
+use crate::{
+    built_info,
+    config::definition::{Config, Strategy},
+    echo::Echo,
+    git::Git,
+};
 
 pub struct Cli {}
 
@@ -16,7 +21,6 @@ impl Cli {
         println!("finish [<branch_type> <branch_name>]/[<full_branch_name>]\n\tfinish a task");
         println!("drop [<branch_type> <branch_name>]/[<full_branch_name>]\n\tgive up a task");
         println!("track [<branch_type> <branch_name>]/[<full_branch_name>]\n\ttrack a task");
-        println!("continue\n\tContinue unfinished task");
         if config_list.len() > 0 {
             println!("\nConfigured branch types:\n");
             config_list.iter().for_each(|config| {
@@ -67,9 +71,20 @@ impl Cli {
             return;
         }
 
-        Git::create_branch(&config.source_branch, &branch_name).unwrap();
+        Echo::progress(&format!("Create new branch {}", &branch_name));
+        if let Err(err) = Git::create_branch(&config.source_branch, &branch_name) {
+            println!();
+            Echo::error(&err.to_string());
+        };
+        print!("\r");
         Echo::success(&format!("Create new branch {}", &branch_name));
-        Git::switch(&branch_name).unwrap();
+
+        Echo::progress(&format!("Switch to branch {}", &branch_name));
+        if let Err(err) = Git::switch(&branch_name) {
+            println!();
+            Echo::error(&err.to_string());
+        };
+        print!("\r");
         Echo::success(&format!("Switch to branch {}", &branch_name));
     }
 
@@ -90,9 +105,21 @@ impl Cli {
             Echo::error(&format!("Target branch {} not found", branch_name));
             return;
         }
-        Git::switch(&config.source_branch).unwrap();
+
+        Echo::progress(&format!("Switch to branch {}", &config.source_branch));
+        if let Err(err) = Git::switch(&config.source_branch) {
+            println!();
+            Echo::error(&err.to_string());
+        };
+        print!("\r");
         Echo::success(&format!("Switch to branch {}", &config.source_branch));
-        Git::del_branch(&branch_name).unwrap();
+
+        Echo::progress(&format!("Delete branch {}", &branch_name));
+        if let Err(err) = Git::del_branch(&branch_name) {
+            println!();
+            Echo::error(&err.to_string());
+        }
+        print!("\r");
         Echo::success(&format!("Delete branch {}", &branch_name));
     }
 
@@ -103,6 +130,17 @@ impl Cli {
             .unwrap();
 
         let branch_name = config.branch_name.replace("{new_branch}", branch_name);
+
+        let branches = Git::get_branches().unwrap();
+        if branches
+            .iter()
+            .find(|x| x.as_str() == branch_name)
+            .is_none()
+        {
+            Echo::error(&format!("Target branch {} not found", branch_name));
+            return;
+        }
+
         let result = Git::diff_commits(&branch_name, &config.source_branch).unwrap();
         if result.is_empty() {
             Echo::info(&format!(
@@ -115,6 +153,83 @@ impl Cli {
             "These commits are ahead of the source branch {}:\n",
             config.source_branch,
         ));
-        Git::diff_logs(&branch_name, &config.source_branch).unwrap();
+        if let Err(err) = Git::diff_logs(&branch_name, &config.source_branch) {
+            Echo::error(&err.to_string());
+        };
+    }
+
+    pub fn finish(config_list: &Vec<Config>, branch_type: &str, branch_name: &str) {
+        let config = config_list
+            .iter()
+            .find(|x| x.branch_type == branch_type)
+            .unwrap();
+
+        let branch_name = config.branch_name.replace("{new_branch}", branch_name);
+
+        let branches = Git::get_branches().unwrap();
+
+        for target in &config.target_branches {
+            // if branches
+            //     .iter()
+            //     .find(|x| x.as_str() == branch_name)
+            //     .is_none()
+            // {
+            //     Echo::error(&format!("Target branch {} not found", branch_name));
+            //     return;
+            // }
+            match target.strategy {
+                Strategy::Merge => {
+                    Echo::progress(&format!("Merge {} into {}", &branch_name, &target.name));
+                    if let Err(err) = Git::switch(&target.name) {
+                        println!();
+                        Echo::error(&err.to_string());
+                        return;
+                    };
+                    if let Err(err) = Git::merge(&branch_name) {
+                        println!();
+                        let err_info = err.to_string();
+                        Echo::error(if err_info.is_empty() {
+                            "Automatic merge failed.\nFix conflicts and then re-run the command."
+                        } else {
+                            &err_info
+                        });
+                        return;
+                    };
+                    print!("\r");
+                    Echo::success(&format!("Merge {} into {}", &branch_name, &target.name));
+                }
+                Strategy::Rebase => {
+                    Echo::progress(&format!("Rebase {} onto {}", &target.name, &branch_name));
+                    if let Err(err) = Git::switch(&target.name) {
+                        println!();
+                        Echo::error(&err.to_string());
+                        return;
+                    };
+                    if let Err(err) = Git::rebase(&branch_name) {
+                        println!();
+                        let err_info = err.to_string();
+                        Echo::error(if err_info.is_empty() {
+                            "Automatic rebase failed.\nFix conflicts and then re-run the command."
+                        } else {
+                            &err_info
+                        });
+                        return;
+                    };
+                    print!("\r");
+                    Echo::success(&format!("Rebase {} onto {}", &target.name, &branch_name));
+                }
+                Strategy::CherryPick => {
+                    // TODO: cherry pick (niuiic)
+                }
+            }
+        }
+
+        Echo::progress(&format!("Delete branch {}", &branch_name));
+        if let Err(err) = Git::del_branch(&branch_name) {
+            println!();
+            Echo::error(&err.to_string());
+        };
+        print!("\r");
+        Echo::success(&format!("Delete branch {}", &branch_name));
     }
 }

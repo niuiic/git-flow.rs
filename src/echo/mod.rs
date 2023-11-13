@@ -19,4 +19,8 @@ impl Echo {
     pub fn success(msg: &str) {
         println!("\x1B[32m\u{2714} {}\x1B[0m", msg);
     }
+
+    pub fn progress(msg: &str) {
+        print!("\x1B[38;2;128;128;128m\u{23F3}{}\x1B[0m", msg);
+    }
 }

@@ -6,4 +6,5 @@ fn echo_t() {
     Echo::info("hello");
     Echo::success("hello");
     Echo::error("hello");
+    Echo::progress("hello");
 }
