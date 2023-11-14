@@ -5,7 +5,7 @@ pub struct Echo {}
 
 impl Echo {
     pub fn error(msg: &str) {
-        println!("\x1B[31m\u{2718} {}\x1B[0m", msg);
+        eprintln!("\x1B[31m\u{2718} {}\x1B[0m", msg);
     }
 
     pub fn info(msg: &str) {
