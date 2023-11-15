@@ -17,6 +17,11 @@ fn main() {
         return;
     }
 
+    if !Git::in_git_project() {
+        Echo::error("You are not in a git project");
+        return;
+    }
+
     let config_list = read_config().unwrap();
     validate_config(&config_list).unwrap();
 

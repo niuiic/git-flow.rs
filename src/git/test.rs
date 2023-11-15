@@ -6,6 +6,11 @@ fn has_git_t() {
 }
 
 #[test]
+fn in_git_project_t() {
+    assert_eq!(Git::in_git_project(), true);
+}
+
+#[test]
 fn switch_t() {
     let result = Git::switch("undefined");
     assert_eq!(result.is_ok(), false);

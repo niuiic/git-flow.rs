@@ -3,7 +3,7 @@ use std::{
     process::Command,
 };
 
-use anyhow::{bail, Ok, Result};
+use anyhow::{bail, Result};
 
 #[cfg(test)]
 mod test;
@@ -15,6 +15,17 @@ impl Git {
         let output = Command::new("git").arg("--version").output();
         if output.is_ok() {
             true
+        } else {
+            false
+        }
+    }
+
+    pub fn in_git_project() -> bool {
+        let output = Command::new("git")
+            .args(["rev-parse", "--is-inside-work-tree"])
+            .output();
+        if let Ok(output) = output {
+            output.status.success()
         } else {
             false
         }
