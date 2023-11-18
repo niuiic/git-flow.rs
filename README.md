@@ -16,6 +16,8 @@ cargo install git-flow-rs
 
 `git-flow --help`
 
+> `git flow` is avaliable too.
+
 ```
 Extensible git flow written in rust.
 
