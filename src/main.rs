@@ -22,8 +22,20 @@ fn main() {
         return;
     }
 
-    let config_list = read_config().unwrap();
-    validate_config(&config_list).unwrap();
+    let config_list;
+    match read_config() {
+        Ok(config_list_v) => {
+            config_list = config_list_v;
+        }
+        Err(err) => {
+            Echo::error(&err.to_string());
+            return;
+        }
+    }
+    if let Err(err) = validate_config(&config_list) {
+        Echo::error(&err.to_string());
+        return;
+    };
 
     let args = &env::args().collect::<Vec<String>>()[1..];
 

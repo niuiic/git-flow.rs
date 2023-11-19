@@ -1,6 +1,5 @@
-use std::collections::HashSet;
-
-use anyhow::{anyhow, Ok, Result};
+use anyhow::{bail, Ok, Result};
+use regex::Regex;
 
 use super::definition::Config;
 
@@ -8,10 +7,12 @@ use super::definition::Config;
 mod test;
 
 pub fn validate_config(config_list: &Vec<Config>) -> Result<()> {
-    let mut duplicate_config_types = HashSet::<String>::new();
-    let mut duplicate_config_names = HashSet::<String>::new();
+    has_duplicate_config(&config_list)?;
+    has_invalid_branch_name(&config_list)?;
+    Ok(())
+}
 
-    // check duplicate config
+fn has_duplicate_config(config_list: &Vec<Config>) -> Result<()> {
     for i in 0..config_list.len() {
         let config = &config_list[i];
 
@@ -22,45 +23,42 @@ pub fn validate_config(config_list: &Vec<Config>) -> Result<()> {
                 continue;
             }
             if config.branch_type == config_2.branch_type {
-                duplicate_config_types.insert(config.branch_type.clone());
+                bail!(format!(
+                    "Invalid config: duplicate type {}",
+                    &config.branch_type
+                ));
             }
             if config.branch_name == config_2.branch_name {
-                duplicate_config_names.insert(config.branch_name.clone());
+                bail!(format!(
+                    "Invalid config: duplicate name {}",
+                    &config.branch_type
+                ));
             }
         }
     }
 
-    if duplicate_config_types.len() + duplicate_config_names.len() == 0 {
-        return Ok(());
+    Ok(())
+}
+
+fn has_invalid_branch_name(config_list: &Vec<Config>) -> Result<()> {
+    let regex = Regex::new(r"\{new_branch\}").unwrap();
+
+    for i in 0..config_list.len() {
+        let config = &config_list[i];
+        let matches: Vec<_> = regex.find_iter(&config.branch_name).collect();
+        if matches.len() == 0 {
+            bail!(format!(
+                "Invalid config: {} does not contain a {{new_branch}}",
+                &config.branch_name
+            ));
+        }
+        if matches.len() > 1 {
+            bail!(format!(
+                "Invalid config: {} contains more than one {{new_branch}}",
+                &config.branch_name
+            ));
+        }
     }
 
-    if duplicate_config_types.len() > 0 && duplicate_config_names.len() > 0 {
-        Err(anyhow!(
-            "Invalid config: duplicate type {} and duplicate name {}",
-            duplicate_config_types
-                .into_iter()
-                .collect::<Vec<String>>()
-                .join(","),
-            duplicate_config_names
-                .into_iter()
-                .collect::<Vec<String>>()
-                .join(","),
-        ))
-    } else if duplicate_config_names.len() == 0 {
-        Err(anyhow!(
-            "Invalid config: duplicate type {}",
-            duplicate_config_types
-                .into_iter()
-                .collect::<Vec<String>>()
-                .join(","),
-        ))
-    } else {
-        Err(anyhow!(
-            "Invalid config: duplicate name {}",
-            duplicate_config_names
-                .into_iter()
-                .collect::<Vec<String>>()
-                .join(","),
-        ))
-    }
+    Ok(())
 }
