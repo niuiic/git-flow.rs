@@ -11,7 +11,8 @@ use config::{parse::get_branch_type_name, read::read_config, validate::validate_
 use echo::Echo;
 use git::Git;
 
-fn main() {
+#[tokio::main]
+async fn main() {
     // %% validate env %%
     if !Git::has_git() {
         Echo::error("git not installed");
@@ -72,7 +73,6 @@ fn main() {
                 }
             }
         }
-        // _ => Cli::help(&config_list),
-        _ => Echo::progress("hello"),
+        _ => Cli::help(&config_list),
     }
 }

@@ -20,8 +20,10 @@ impl Cli {
             return;
         }
 
-        Echo::progress(&format!("Switch to branch {}", &config.source_branch));
-        if let Err(err) = Git::switch(&config.source_branch) {
+        let stop = Echo::progress(&format!("Switch to branch {}", &config.source_branch));
+        let result = Git::switch(&config.source_branch);
+        stop();
+        if let Err(err) = result {
             println!();
             Echo::error(&err.to_string());
             return;
@@ -29,8 +31,10 @@ impl Cli {
         print!("\r");
         Echo::success(&format!("Switch to branch {}", &config.source_branch));
 
-        Echo::progress(&format!("Delete branch {}", &branch_name));
-        if let Err(err) = Git::del_branch(&branch_name) {
+        let stop = Echo::progress(&format!("Delete branch {}", &branch_name));
+        let result = Git::del_branch(&branch_name);
+        stop();
+        if let Err(err) = result {
             println!();
             Echo::error(&err.to_string());
             return;

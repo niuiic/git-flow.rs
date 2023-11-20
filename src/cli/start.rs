@@ -32,8 +32,10 @@ impl Cli {
         }
 
         // %% create new branch %%
-        Echo::progress(&format!("Create new branch {}", &branch_name));
-        if let Err(err) = Git::create_branch(&config.source_branch, &branch_name) {
+        let stop = Echo::progress(&format!("Create new branch {}", &branch_name));
+        let result = Git::create_branch(&config.source_branch, &branch_name);
+        stop();
+        if let Err(err) = result {
             println!();
             Echo::error(&err.to_string());
             return;
@@ -42,8 +44,10 @@ impl Cli {
         Echo::success(&format!("Create new branch {}", &branch_name));
 
         // %% switch to new branch %%
-        Echo::progress(&format!("Switch to branch {}", &branch_name));
-        if let Err(err) = Git::switch(&branch_name) {
+        let stop = Echo::progress(&format!("Switch to branch {}", &branch_name));
+        let result = Git::switch(&branch_name);
+        stop();
+        if let Err(err) = result {
             println!();
             Echo::error(&err.to_string());
             return;

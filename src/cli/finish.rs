@@ -44,8 +44,11 @@ impl Cli {
         for target in &target_branches {
             match target.strategy {
                 Strategy::Merge => {
-                    Echo::progress(&format!("Merge {} into {}", &branch_name, &target.name));
-                    if let Err(err) = Git::switch(&target.name) {
+                    let stop =
+                        Echo::progress(&format!("Merge {} into {}", &branch_name, &target.name));
+                    let result = Git::switch(&target.name);
+                    stop();
+                    if let Err(err) = result {
                         println!();
                         Echo::error(&err.to_string());
                         return;
@@ -64,8 +67,11 @@ impl Cli {
                     Echo::success(&format!("Merge {} into {}", &branch_name, &target.name));
                 }
                 Strategy::Rebase => {
-                    Echo::progress(&format!("Rebase {} onto {}", &target.name, &branch_name));
-                    if let Err(err) = Git::switch(&target.name) {
+                    let stop =
+                        Echo::progress(&format!("Rebase {} onto {}", &target.name, &branch_name));
+                    let result = Git::switch(&target.name);
+                    stop();
+                    if let Err(err) = result {
                         println!();
                         Echo::error(&err.to_string());
                         return;
@@ -101,8 +107,10 @@ impl Cli {
                         )
                     };
 
-                    Echo::progress(&info);
-                    if let Err(err) = Git::switch(&target.name) {
+                    let stop = Echo::progress(&info);
+                    let result = Git::switch(&target.name);
+                    stop();
+                    if let Err(err) = result {
                         println!();
                         Echo::error(&err.to_string());
                         return;
@@ -119,8 +127,10 @@ impl Cli {
         }
 
         // %% delete branch %%
-        Echo::progress(&format!("Delete branch {}", &branch_name));
-        if let Err(err) = Git::switch(&config.source_branch) {
+        let stop = Echo::progress(&format!("Delete branch {}", &branch_name));
+        let result = Git::switch(&config.source_branch);
+        stop();
+        if let Err(err) = result {
             println!();
             Echo::error(&err.to_string());
             return;
