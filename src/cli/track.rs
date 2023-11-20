@@ -10,7 +10,7 @@ impl Cli {
 
         let branch_name = config.branch_name.replace("{new_branch}", branch_name);
 
-        let branches = Git::get_branches().unwrap();
+        let branches = Git::get_local_branches().unwrap();
         if branches
             .iter()
             .find(|x| x.as_str() == branch_name)

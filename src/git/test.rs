@@ -37,8 +37,8 @@ fn cherry_pick_t() {
 }
 
 #[test]
-fn del_branch_t() {
-    let result = Git::del_branch("undefined");
+fn del_local_branch_t() {
+    let result = Git::del_local_branch("undefined");
     assert_eq!(result.is_ok(), false);
 }
 
@@ -49,18 +49,47 @@ fn diff_commits_t() {
 }
 
 #[test]
-fn create_branch_t() {
-    let result = Git::create_branch("main", "main");
+fn create_local_branch_t() {
+    let result = Git::create_local_branch("main", "main");
     assert_eq!(result.is_ok(), false)
 }
 
 #[test]
-fn get_branches_t() {
-    let result = Git::get_branches().unwrap();
+fn create_remote_branch_t() {
+    let result = Git::create_remote_branch("test", "main", "main");
+    assert_eq!(result.is_ok(), false)
+}
+
+#[test]
+fn get_local_branches_t() {
+    let result = Git::get_local_branches().unwrap();
     assert_eq!(result.iter().find(|x| x.as_str() == "main").is_some(), true);
 }
 
 #[test]
-fn diff_logs() {
+fn query_remote_branches_t() {
+    Git::get_remote_branches("origin").unwrap();
+}
+
+#[test]
+fn diff_logs_t() {
     Git::diff_logs("main", "main").unwrap();
+}
+
+#[test]
+fn fetch_remote_branches_t() {
+    Git::fetch_remote_branches().unwrap();
+}
+
+#[test]
+fn get_remote_repos() {
+    let repos = Git::get_remote_repos().unwrap();
+    assert_eq!(repos.iter().any(|x| x == "origin"), true);
+    assert_eq!(repos.len(), 1);
+}
+
+#[test]
+fn del_remote_branch_t() {
+    let result = Git::del_remote_branch("test", "main");
+    assert_eq!(result.is_ok(), false);
 }

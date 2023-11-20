@@ -21,7 +21,7 @@ impl Cli {
         let branch_name = config.branch_name.replace("{new_branch}", branch_name);
 
         // %% get/validate branches %%
-        let branches = Git::get_branches().unwrap();
+        let branches = Git::get_local_branches().unwrap();
         if branches.iter().all(|x| x.as_str() != config.source_branch) {
             Echo::error(&format!("Source branch {} not found", config.source_branch));
             return;
@@ -33,7 +33,7 @@ impl Cli {
 
         // %% create new branch %%
         let stop = Echo::progress(&format!("Create new branch {}", &branch_name));
-        let result = Git::create_branch(&config.source_branch, &branch_name);
+        let result = Git::create_local_branch(&config.source_branch, &branch_name);
         stop();
         if let Err(err) = result {
             println!();

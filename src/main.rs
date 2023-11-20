@@ -6,7 +6,10 @@ mod git;
 
 use std::env;
 
-use cli::Cli;
+use cli::{
+    sync::{SyncStrategy, SyncTarget},
+    Cli,
+};
 use config::{parse::get_branch_type_name, read::read_config, validate::validate_config};
 use echo::Echo;
 use git::Git;
@@ -72,6 +75,30 @@ async fn main() {
                     Echo::error(&err.to_string());
                 }
             }
+        }
+        "sync" => {
+            let target = match args.get(1) {
+                Some(value) => match value.as_str() {
+                    "remote" => SyncTarget::Remote,
+                    "local" => SyncTarget::Local,
+                    _ => {
+                        Echo::error("Wrong arguments");
+                        return;
+                    }
+                },
+                _ => {
+                    Echo::error("Wrong arguments");
+                    return;
+                }
+            };
+
+            let strategy = if args[2..].iter().any(|x| x.as_str() == "--override") {
+                SyncStrategy::Override
+            } else {
+                SyncStrategy::Increment
+            };
+
+            Cli::sync(target, strategy);
         }
         _ => Cli::help(&config_list),
     }

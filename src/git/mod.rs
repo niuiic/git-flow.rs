@@ -4,9 +4,12 @@ use std::{
 };
 
 use anyhow::{bail, Result};
+use regex::Regex;
 
 #[cfg(test)]
 mod test;
+
+mod branch;
 
 pub struct Git {}
 
@@ -70,28 +73,6 @@ impl Git {
         }
     }
 
-    pub fn del_branch(target_branch: &str) -> Result<()> {
-        let output = Command::new("git")
-            .args(["branch", "-D", target_branch])
-            .output()?;
-        if output.status.success() {
-            Ok(())
-        } else {
-            bail!(String::from_utf8(output.stderr).unwrap());
-        }
-    }
-
-    pub fn create_branch(source_branch: &str, target_branch: &str) -> Result<()> {
-        let output = Command::new("git")
-            .args(["branch", target_branch, source_branch])
-            .output()?;
-        if output.status.success() {
-            Ok(())
-        } else {
-            bail!(String::from_utf8(output.stderr).unwrap());
-        }
-    }
-
     /// commits on source_branch but not on target_branch
     pub fn diff_commits(source_branch: &str, target_branch: &str) -> Result<Vec<String>> {
         let output = Command::new("git")
@@ -130,8 +111,8 @@ impl Git {
         Ok(())
     }
 
-    pub fn get_branches() -> Result<Vec<String>> {
-        let output = Command::new("git").args(["branch"]).output()?;
+    pub fn get_remote_repos() -> Result<Vec<String>> {
+        let output = Command::new("git").args(["remote"]).output()?;
         if !output.status.success() {
             bail!(String::from_utf8(output.stderr).unwrap());
         }
@@ -140,7 +121,7 @@ impl Git {
         Ok(output_str
             .split('\n')
             .filter(|x| *x != "")
-            .map(|x| x.replace("*", "").trim().to_string())
+            .map(|x| x.to_string())
             .collect::<Vec<String>>())
     }
 }

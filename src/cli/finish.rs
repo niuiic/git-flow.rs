@@ -19,7 +19,7 @@ impl Cli {
         let branch_name = config.branch_name.replace("{new_branch}", branch_name);
 
         // %% get/validate branches %%
-        let branches = Git::get_branches().unwrap();
+        let branches = Git::get_local_branches().unwrap();
         if branches.iter().all(|x| x.as_str() != branch_name) {
             Echo::error(&format!("Branch {} not found", branch_name));
             return;
@@ -54,8 +54,8 @@ impl Cli {
                         return;
                     };
                     if let Err(err) = Git::merge(&branch_name) {
-                        println!();
                         let err_info = err.to_string();
+                        println!();
                         Echo::error(if err_info.is_empty() {
                             "Automatic merge failed.\nFix conflicts and then re-run the command."
                         } else {
@@ -77,8 +77,8 @@ impl Cli {
                         return;
                     };
                     if let Err(err) = Git::rebase(&branch_name) {
-                        println!();
                         let err_info = err.to_string();
+                        println!();
                         Echo::error(if err_info.is_empty() {
                             "Automatic rebase failed.\nFix conflicts and then re-run the command."
                         } else {
@@ -135,7 +135,7 @@ impl Cli {
             Echo::error(&err.to_string());
             return;
         };
-        if let Err(err) = Git::del_branch(&branch_name) {
+        if let Err(err) = Git::del_local_branch(&branch_name) {
             println!();
             Echo::error(&err.to_string());
             return;
