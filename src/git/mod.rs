@@ -13,11 +13,7 @@ pub struct Git {}
 impl Git {
     pub fn has_git() -> bool {
         let output = Command::new("git").arg("--version").output();
-        if output.is_ok() {
-            true
-        } else {
-            false
-        }
+        output.is_ok()
     }
 
     pub fn in_git_project() -> bool {

@@ -12,38 +12,37 @@ use echo::Echo;
 use git::Git;
 
 fn main() {
+    // %% validate env %%
     if !Git::has_git() {
         Echo::error("git not installed");
         return;
     }
-
     if !Git::in_git_project() {
         Echo::error("You are not in a git project");
         return;
     }
 
-    let config_list;
-    match read_config() {
-        Ok(config_list_v) => {
-            config_list = config_list_v;
-        }
+    // %% read config %%
+    let config_list = match read_config() {
         Err(err) => {
             Echo::error(&err.to_string());
             return;
         }
-    }
+        Ok(value) => value,
+    };
     if let Err(err) = validate_config(&config_list) {
         Echo::error(&err.to_string());
         return;
     };
 
+    // %% receive args %%
     let args = &env::args().collect::<Vec<String>>()[1..];
-
     if args.get(0).is_none() {
         Cli::help(&config_list);
         return;
     }
 
+    // %% exec commands %%
     match args[0].as_str() {
         "-h" | "--help" => Cli::help(&config_list),
         "-v" | "--version" => Cli::version(),
@@ -73,6 +72,7 @@ fn main() {
                 }
             }
         }
-        _ => Cli::help(&config_list),
+        // _ => Cli::help(&config_list),
+        _ => Echo::progress("hello"),
     }
 }
