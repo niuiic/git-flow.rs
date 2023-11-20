@@ -1,38 +1,47 @@
+use regex::Regex;
+
 use super::Cli;
 use crate::{
-    config::definition::{Config, Strategy},
+    config::definition::{Config, Strategy, TargetBranch},
     echo::Echo,
     git::Git,
 };
 
 impl Cli {
     pub fn finish(config_list: &Vec<Config>, branch_type: &str, branch_name: &str) {
+        // %% find config %%
         let config = config_list
             .iter()
             .find(|x| x.branch_type == branch_type)
             .unwrap();
 
+        // %% calculate branch name %%
         let branch_name = config.branch_name.replace("{new_branch}", branch_name);
 
+        // %% get/validate branches %%
         let branches = Git::get_branches().unwrap();
-        let mut work_branches: Vec<String> = config
-            .target_branches
-            .iter()
-            .map(|x| x.name.to_string())
-            .collect();
-        work_branches.push(config.source_branch.clone());
-        work_branches.push(branch_name.clone());
-        let missing_branches: Vec<String> = work_branches
-            .iter()
-            .filter(|x| branches.iter().find(|y| y.as_str() == x.as_str()).is_none())
-            .map(|x| x.to_string())
-            .collect();
-        if missing_branches.len() > 0 {
-            Echo::error(&format!("Branch {} not found.", missing_branches.join(",")));
+        if branches.iter().all(|x| x.as_str() != branch_name) {
+            Echo::error(&format!("Branch {} not found", branch_name));
             return;
         }
 
+        // %% collect target branches %%
+        let mut target_branches = Vec::<TargetBranch>::new();
         for target in &config.target_branches {
+            let regex = Regex::new(&target.name).unwrap();
+            branches.iter().filter(|x| regex.is_match(x)).for_each(|x| {
+                if target_branches.iter().any(|y| y.name == *x) {
+                    return;
+                }
+                target_branches.push(TargetBranch {
+                    name: x.clone(),
+                    strategy: target.strategy.clone(),
+                });
+            });
+        }
+
+        // %% resolve target %%
+        for target in &target_branches {
             match target.strategy {
                 Strategy::Merge => {
                     Echo::progress(&format!("Merge {} into {}", &branch_name, &target.name));
@@ -109,6 +118,7 @@ impl Cli {
             }
         }
 
+        // %% delete branch %%
         Echo::progress(&format!("Delete branch {}", &branch_name));
         if let Err(err) = Git::switch(&config.source_branch) {
             println!();
