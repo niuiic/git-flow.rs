@@ -9,6 +9,7 @@ mod test;
 pub fn validate_config(config_list: &Vec<Config>) -> Result<()> {
     has_duplicate_config(&config_list)?;
     has_invalid_branch_name(&config_list)?;
+    target_is_valid_regex(&config_list)?;
     Ok(())
 }
 
@@ -45,6 +46,7 @@ fn has_invalid_branch_name(config_list: &Vec<Config>) -> Result<()> {
 
     for i in 0..config_list.len() {
         let config = &config_list[i];
+
         let matches: Vec<_> = regex.find_iter(&config.branch_name).collect();
         if matches.len() == 0 {
             bail!(format!(
@@ -57,6 +59,25 @@ fn has_invalid_branch_name(config_list: &Vec<Config>) -> Result<()> {
                 "Invalid config: {} contains more than one {{new_branch}}",
                 &config.branch_name
             ));
+        }
+    }
+
+    Ok(())
+}
+
+fn target_is_valid_regex(config_list: &Vec<Config>) -> Result<()> {
+    for i in 0..config_list.len() {
+        let config = &config_list[i];
+
+        for j in 0..config.target_branches.len() {
+            let target = &config.target_branches[j];
+
+            if Regex::new(&target.name).is_err() {
+                bail!(format!(
+                    "Invalid config: target branch {} is not a valid regex",
+                    &target.name
+                ))
+            }
         }
     }
 
