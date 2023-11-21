@@ -22,6 +22,10 @@
       {
         "branch": "dev",
         "strategy": "merge"
+      },
+      {
+        "branch": "feature/*",
+        "strategy": "merge"
       }
     ]
   },
@@ -32,6 +36,10 @@
     "to": [
       {
         "branch": "dev",
+        "strategy": "merge"
+      },
+      {
+        "branch": "feature/*",
         "strategy": "merge"
       }
     ]
