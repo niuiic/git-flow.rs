@@ -54,7 +54,7 @@ A small example.
 ```sh
 # start a feature
 git flow start feature something
-# or git-flow start feature/something
+# or git flow start feature/something
 # then branch feature/something created from dev
 
 # implement the feature
