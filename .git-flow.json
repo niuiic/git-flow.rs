@@ -10,21 +10,13 @@
       }
     ],
     "hooks": {
-      "before_start": {
-        "command": "echo",
-        "args": ["{new_branch}"]
-      },
       "after_start": {
-        "command": "echo",
-        "args": ["{new_branch}"]
-      },
-      "before_finish": {
-        "command": "echo",
-        "args": ["{new_branch}"]
+        "command": "git",
+        "args": ["push", "origin", "feature/{new_branch}:feature/{new_branch}"]
       },
       "after_finish": {
-        "command": "echo",
-        "args": ["{new_branch}"]
+        "command": "git",
+        "args": ["push", "origin", "--delete", "feature/{new_branch}"]
       }
     }
   },

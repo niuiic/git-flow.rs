@@ -74,6 +74,9 @@ Local config file should be located at `<GitRoot>/.git-flow.json`.
 There is no default configuration. Here is an example.
 
 > Avaliable strategy: `merge`, `rebase`, `cherry-pick`.
+
+> Avaliable hook: `before_start`, `after_start`, `before_finish`, `after_finish`.
+
 > Regex is avaliable on `to.n.branch`.
 
 ```json
@@ -87,7 +90,17 @@ There is no default configuration. Here is an example.
         "branch": "dev",
         "strategy": "merge"
       }
-    ]
+    ],
+    "hooks": {
+      "after_start": {
+        "command": "git",
+        "args": ["push", "origin", "feature/{new_branch}:feature/{new_branch}"]
+      },
+      "after_finish": {
+        "command": "git",
+        "args": ["push", "origin", "--delete", "feature/{new_branch}"]
+      }
+    }
   },
   {
     "type": "hotfix",
