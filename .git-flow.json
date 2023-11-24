@@ -8,7 +8,25 @@
         "branch": "dev",
         "strategy": "merge"
       }
-    ]
+    ],
+    "hooks": {
+      "before_start": {
+        "command": "echo",
+        "args": ["{new_branch}"]
+      },
+      "after_start": {
+        "command": "echo",
+        "args": ["{new_branch}"]
+      },
+      "before_finish": {
+        "command": "echo",
+        "args": ["{new_branch}"]
+      },
+      "after_finish": {
+        "command": "echo",
+        "args": ["{new_branch}"]
+      }
+    }
   },
   {
     "type": "hotfix",

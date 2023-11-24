@@ -2,6 +2,7 @@ use regex::Regex;
 
 use super::Cli;
 use crate::{
+    cli::hook::{exec_hook, Hook},
     config::definition::{Config, Strategy, TargetBranch},
     echo::Echo,
     git::Git,
@@ -16,12 +17,12 @@ impl Cli {
             .unwrap();
 
         // %% calculate branch name %%
-        let branch_name = config.branch_name.replace("{new_branch}", branch_name);
+        let full_branch_name = config.branch_name.replace("{new_branch}", branch_name);
 
         // %% get/validate branches %%
         let branches = Git::get_local_branches().unwrap();
-        if branches.iter().all(|x| x.as_str() != branch_name) {
-            Echo::error(&format!("Branch {} not found", branch_name));
+        if branches.iter().all(|x| x.as_str() != full_branch_name) {
+            Echo::error(&format!("Branch {} not found", full_branch_name));
             return;
         }
 
@@ -40,12 +41,19 @@ impl Cli {
             });
         }
 
+        // %% run before finish hook %%
+        if let Err(_) = exec_hook(&config, Hook::BeforeFinish, branch_name) {
+            return;
+        }
+
         // %% resolve target %%
         for target in &target_branches {
             match target.strategy {
                 Strategy::Merge => {
-                    let stop =
-                        Echo::progress(&format!("Merge {} into {}", &branch_name, &target.name));
+                    let stop = Echo::progress(&format!(
+                        "Merge {} into {}",
+                        &full_branch_name, &target.name
+                    ));
                     let result = Git::switch(&target.name);
                     stop();
                     if let Err(err) = result {
@@ -53,7 +61,7 @@ impl Cli {
                         Echo::error(&err.to_string());
                         return;
                     };
-                    if let Err(err) = Git::merge(&branch_name) {
+                    if let Err(err) = Git::merge(&full_branch_name) {
                         let err_info = err.to_string();
                         println!();
                         Echo::error(if err_info.is_empty() {
@@ -64,11 +72,16 @@ impl Cli {
                         return;
                     };
                     print!("\r");
-                    Echo::success(&format!("Merge {} into {}", &branch_name, &target.name));
+                    Echo::success(&format!(
+                        "Merge {} into {}",
+                        &full_branch_name, &target.name
+                    ));
                 }
                 Strategy::Rebase => {
-                    let stop =
-                        Echo::progress(&format!("Rebase {} onto {}", &target.name, &branch_name));
+                    let stop = Echo::progress(&format!(
+                        "Rebase {} onto {}",
+                        &target.name, &full_branch_name
+                    ));
                     let result = Git::switch(&target.name);
                     stop();
                     if let Err(err) = result {
@@ -76,7 +89,7 @@ impl Cli {
                         Echo::error(&err.to_string());
                         return;
                     };
-                    if let Err(err) = Git::rebase(&branch_name) {
+                    if let Err(err) = Git::rebase(&full_branch_name) {
                         let err_info = err.to_string();
                         println!();
                         Echo::error(if err_info.is_empty() {
@@ -87,10 +100,13 @@ impl Cli {
                         return;
                     };
                     print!("\r");
-                    Echo::success(&format!("Rebase {} onto {}", &target.name, &branch_name));
+                    Echo::success(&format!(
+                        "Rebase {} onto {}",
+                        &target.name, &full_branch_name
+                    ));
                 }
                 Strategy::CherryPick => {
-                    let commits = Git::diff_commits(&branch_name, &target.name).unwrap();
+                    let commits = Git::diff_commits(&full_branch_name, &target.name).unwrap();
                     if commits.len() == 0 {
                         Echo::warn(&format!("No commits to cherry pick to {}", &target.name));
                         continue;
@@ -127,7 +143,7 @@ impl Cli {
         }
 
         // %% delete branch %%
-        let stop = Echo::progress(&format!("Delete branch {}", &branch_name));
+        let stop = Echo::progress(&format!("Delete branch {}", &full_branch_name));
         let result = Git::switch(&config.source_branch);
         stop();
         if let Err(err) = result {
@@ -135,12 +151,17 @@ impl Cli {
             Echo::error(&err.to_string());
             return;
         };
-        if let Err(err) = Git::del_local_branch(&branch_name) {
+        if let Err(err) = Git::del_local_branch(&full_branch_name) {
             println!();
             Echo::error(&err.to_string());
             return;
         };
         print!("\r");
-        Echo::success(&format!("Delete branch {}", &branch_name));
+        Echo::success(&format!("Delete branch {}", &full_branch_name));
+
+        // %% run after finish hook %%
+        if let Err(_) = exec_hook(&config, Hook::AfterFinish, branch_name) {
+            return;
+        }
     }
 }

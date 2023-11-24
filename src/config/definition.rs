@@ -10,6 +10,7 @@ pub struct Config {
     pub source_branch: String,
     #[serde(rename = "to")]
     pub target_branches: Vec<TargetBranch>,
+    pub hooks: Option<Hooks>,
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone)]
@@ -27,4 +28,18 @@ pub enum Strategy {
     Rebase,
     #[serde(rename = "cherry-pick")]
     CherryPick,
+}
+
+#[derive(Debug, Deserialize, Serialize, Clone)]
+pub struct Command {
+    pub command: String,
+    pub args: Vec<String>,
+}
+
+#[derive(Debug, Deserialize, Serialize, Clone)]
+pub struct Hooks {
+    pub before_start: Option<Command>,
+    pub after_start: Option<Command>,
+    pub before_finish: Option<Command>,
+    pub after_finish: Option<Command>,
 }

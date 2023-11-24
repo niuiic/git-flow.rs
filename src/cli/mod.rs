@@ -5,6 +5,7 @@ mod test;
 
 mod drop;
 mod finish;
+mod hook;
 mod start;
 pub mod sync;
 mod track;
