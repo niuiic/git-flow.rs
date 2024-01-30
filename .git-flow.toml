@@ -1,0 +1,15 @@
+[[branch_types]]
+name = "feature"
+create = "feature/{new_branch}"
+from = "dev"
+to = [{ name = "dev", strategy = "merge" }]
+
+[[branch_types]]
+name = "hotfix"
+create = "hotfix/{new_branch}"
+from = "main"
+to = [
+  { name = "main", strategy = "merge" },
+  { name = "dev", strategy = "merge" },
+  { name = "feature/*", strategy = "merge" },
+]

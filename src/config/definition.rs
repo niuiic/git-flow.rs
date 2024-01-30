@@ -20,7 +20,6 @@ pub struct BranchType {
 
 #[derive(Debug, Deserialize, Clone)]
 pub struct TargetBranch {
-    #[serde(rename = "branch")]
     pub name: String,
     pub strategy: Strategy,
 }

@@ -11,8 +11,8 @@ mod test;
 pub struct Echo {}
 
 impl Echo {
-    pub fn error(msg: &str) {
-        eprintln!("\x1B[31m\u{2718} {}\x1B[0m", msg);
+    pub fn error<T: Into<String>>(msg: T) {
+        eprintln!("\x1B[31m\u{2718} {}\x1B[0m", &msg.into());
     }
 
     pub fn info(msg: &str) {
@@ -34,10 +34,10 @@ impl Echo {
         let spinners = vec!["\u{280B}", "\u{2819}", "\u{2839}", "\u{2838}", "\u{283C}"];
 
         tokio::spawn(async move {
-            'task: loop {
+            loop {
                 for spinner in &spinners {
                     if let Ok(_) = rx.try_recv() {
-                        break 'task;
+                        return;
                     }
 
                     print!("\r\x1B[38;2;128;128;128m{} {}\x1B[0m", spinner, &msg);
