@@ -2,7 +2,7 @@ use super::*;
 
 #[test]
 fn has_git_t() {
-    assert_eq!(Git::has_git(), true);
+    assert_eq!(Git::git_installed(), true);
 }
 
 #[test]
@@ -78,7 +78,7 @@ fn diff_logs_t() {
 
 #[test]
 fn fetch_remote_branches_t() {
-    Git::fetch_remote_branches().unwrap();
+    Git::fetch_remote_data().unwrap();
 }
 
 #[test]

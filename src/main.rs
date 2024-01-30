@@ -5,7 +5,7 @@ mod cli;
 mod command;
 mod config;
 mod echo;
-// mod git;
+mod git;
 
 #[tokio::main]
 async fn main() {

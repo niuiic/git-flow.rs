@@ -1,7 +1,11 @@
-use anyhow::Ok;
+use std::process::Command;
 
-use super::*;
+use anyhow::{bail, Result};
+use regex::Regex;
 
+use super::Git;
+
+// # delete
 impl Git {
     pub fn del_local_branch(target_branch: &str) -> Result<()> {
         let output = Command::new("git")
@@ -24,7 +28,10 @@ impl Git {
             bail!(String::from_utf8(output.stderr).unwrap());
         }
     }
+}
 
+// # create
+impl Git {
     pub fn create_local_branch(source_branch: &str, target_branch: &str) -> Result<()> {
         let output = Command::new("git")
             .args(["branch", target_branch, source_branch])
@@ -47,8 +54,11 @@ impl Git {
             bail!(String::from_utf8(output.stderr).unwrap());
         }
     }
+}
 
-    pub fn fetch_remote_branches() -> Result<()> {
+// # get
+impl Git {
+    pub fn fetch_remote_data() -> Result<()> {
         let output = Command::new("git").args(["fetch", "--all"]).output()?;
         if !output.status.success() {
             bail!(String::from_utf8(output.stderr).unwrap());

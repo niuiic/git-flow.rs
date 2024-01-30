@@ -4,7 +4,6 @@ use std::{
 };
 
 use anyhow::{bail, Result};
-use regex::Regex;
 
 #[cfg(test)]
 mod test;
@@ -13,8 +12,9 @@ mod branch;
 
 pub struct Git {}
 
+// # status
 impl Git {
-    pub fn has_git() -> bool {
+    pub fn git_installed() -> bool {
         let output = Command::new("git").arg("--version").output();
         output.is_ok()
     }
@@ -29,18 +29,10 @@ impl Git {
             false
         }
     }
+}
 
-    pub fn switch(target_branch: &str) -> Result<()> {
-        let output = Command::new("git")
-            .args(["switch", target_branch])
-            .output()?;
-        if output.status.success() {
-            Ok(())
-        } else {
-            bail!(String::from_utf8(output.stderr).unwrap());
-        }
-    }
-
+// # combine
+impl Git {
     pub fn merge(source_branch: &str) -> Result<()> {
         let output = Command::new("git")
             .args(["merge", source_branch])
@@ -65,6 +57,20 @@ impl Git {
         let output = Command::new("git")
             .arg("cherry-pick")
             .args(commits)
+            .output()?;
+        if output.status.success() {
+            Ok(())
+        } else {
+            bail!(String::from_utf8(output.stderr).unwrap());
+        }
+    }
+}
+
+// # other
+impl Git {
+    pub fn switch(target_branch: &str) -> Result<()> {
+        let output = Command::new("git")
+            .args(["switch", target_branch])
             .output()?;
         if output.status.success() {
             Ok(())
