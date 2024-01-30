@@ -8,7 +8,7 @@ use super::*;
 fn get_global_config_path_t() {
     if env::consts::OS == "linux" {
         let global_config_path = get_global_config_path().unwrap();
-        let regex = Regex::new(r"^/home/.*/.config/git-flow/.git-flow.json$").unwrap();
+        let regex = Regex::new(r"^/home/.*/.config/git-flow/config.toml$").unwrap();
         assert_eq!(regex.is_match(&global_config_path), true);
     }
 }
