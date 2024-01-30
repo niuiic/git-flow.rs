@@ -35,7 +35,10 @@ pub enum Command {
         branch_name: String,
     },
     /// sync branches
-    Sync { target: SyncTarget },
+    Sync {
+        target: SyncTarget,
+        strategy: Option<SyncStrategy>,
+    },
     /// list avaliable branch types
     List,
     /// check config
@@ -46,4 +49,10 @@ pub enum Command {
 pub enum SyncTarget {
     Local,
     Remote,
+}
+
+#[derive(Debug, Clone, ValueEnum)]
+pub enum SyncStrategy {
+    Override,
+    Increment,
 }
