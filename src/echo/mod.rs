@@ -19,7 +19,7 @@ impl Echo {
         println!("\x1B[34m\u{1F6C8} {}\x1B[0m", msg);
     }
 
-    pub fn warn(msg: &str) {
+    pub fn warning(msg: &str) {
         println!("\x1B[33m\u{26A0} {}\x1B[0m", msg);
     }
 

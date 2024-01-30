@@ -21,7 +21,7 @@ pub fn list_branch_types(config_path: Option<PathBuf>) {
         }
         Ok(config_v) => {
             if config_v.branch_types.len() == 0 {
-                Echo::warn("no branch types avaliable");
+                Echo::warning("no branch types avaliable");
                 return;
             }
 

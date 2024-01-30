@@ -2,7 +2,7 @@ use super::*;
 
 #[tokio::test]
 async fn echo_t() {
-    Echo::warn("hello");
+    Echo::warning("hello");
     Echo::info("hello");
     Echo::success("hello");
     Echo::error("hello");
