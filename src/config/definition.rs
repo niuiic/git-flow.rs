@@ -1,26 +1,31 @@
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 
-#[derive(Debug, Deserialize, Serialize, Clone)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct Config {
-    #[serde(rename = "type")]
-    pub branch_type: String,
-    #[serde(rename = "name")]
-    pub branch_name: String,
-    #[serde(rename = "from")]
-    pub source_branch: String,
-    #[serde(rename = "to")]
-    pub target_branches: Vec<TargetBranch>,
-    pub hooks: Option<Hooks>,
+    pub timeout: Option<u64>,
+    pub branch_types: Vec<BranchType>,
 }
 
-#[derive(Debug, Deserialize, Serialize, Clone)]
+#[derive(Debug, Deserialize, Clone)]
+pub struct BranchType {
+    pub name: String,
+    pub create: String,
+    pub from: String,
+    pub to: Vec<TargetBranch>,
+    pub before_start: Option<Command>,
+    pub after_start: Option<Command>,
+    pub before_finish: Option<Command>,
+    pub after_finish: Option<Command>,
+}
+
+#[derive(Debug, Deserialize, Clone)]
 pub struct TargetBranch {
     #[serde(rename = "branch")]
     pub name: String,
     pub strategy: Strategy,
 }
 
-#[derive(Debug, Deserialize, Serialize, Clone)]
+#[derive(Debug, Deserialize, Clone)]
 pub enum Strategy {
     #[serde(rename = "merge")]
     Merge,
@@ -30,16 +35,8 @@ pub enum Strategy {
     CherryPick,
 }
 
-#[derive(Debug, Deserialize, Serialize, Clone)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct Command {
     pub command: String,
     pub args: Vec<String>,
-}
-
-#[derive(Debug, Deserialize, Serialize, Clone)]
-pub struct Hooks {
-    pub before_start: Option<Command>,
-    pub after_start: Option<Command>,
-    pub before_finish: Option<Command>,
-    pub after_finish: Option<Command>,
 }
