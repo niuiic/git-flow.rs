@@ -1,14 +1,14 @@
 use std::{fs::File, io::Read};
 
-use anyhow::{bail, Result};
+use anyhow::{bail, Context, Result};
 
 use super::{definition, path};
 
 #[cfg(test)]
 mod test;
 
-pub fn read_config() -> Result<Vec<definition::Config>> {
-    let config_path_list = path::get_config_path_list()?;
+pub fn read_config() -> Result<definition::Config> {
+    let config_path_list = path::get_config_path_list().context("unable to get config path")?;
 
     let mut config_file = None;
     for config_path in config_path_list {
@@ -18,13 +18,11 @@ pub fn read_config() -> Result<Vec<definition::Config>> {
         }
     }
     if config_file.is_none() {
-        bail!("Config not found");
+        bail!("config file is not found");
     }
 
     let mut text = String::new();
     config_file.unwrap().read_to_string(&mut text)?;
 
-    let config_list: Vec<definition::Config> = serde_json::from_str(&text)?;
-
-    Ok(config_list)
+    toml::from_str::<definition::Config>(&text).context("unable to parse config")
 }
