@@ -15,22 +15,22 @@ impl Echo {
         eprintln!("\x1B[31m\u{2718} {}\x1B[0m", &msg.into());
     }
 
-    pub fn info(msg: &str) {
-        println!("\x1B[34m\u{1F6C8} {}\x1B[0m", msg);
+    pub fn info<T: Into<String>>(msg: T) {
+        println!("\x1B[34m\u{1F6C8} {}\x1B[0m", &msg.into());
     }
 
-    pub fn warning(msg: &str) {
-        println!("\x1B[33m\u{26A0} {}\x1B[0m", msg);
+    pub fn warning<T: Into<String>>(msg: T) {
+        println!("\x1B[33m\u{26A0} {}\x1B[0m", &msg.into());
     }
 
-    pub fn success(msg: &str) {
-        println!("\x1B[32m\u{2714} {}\x1B[0m", msg);
+    pub fn success<T: Into<String>>(msg: T) {
+        println!("\x1B[32m\u{2714} {}\x1B[0m", &msg.into());
     }
 
-    pub fn progress(msg: &str) -> Box<dyn FnOnce()> {
+    pub fn progress<T: Into<String>>(msg: T) -> Box<dyn FnOnce()> {
         let (tx, mut rx) = oneshot::channel();
 
-        let msg = msg.to_string();
+        let msg = msg.into();
         let spinners = vec!["\u{280B}", "\u{2819}", "\u{2839}", "\u{2838}", "\u{283C}"];
 
         tokio::spawn(async move {
