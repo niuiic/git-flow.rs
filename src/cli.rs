@@ -16,27 +16,32 @@ pub struct Args {
 pub enum Command {
     /// start a task
     Start {
-        branch_type: String,
+        /// input full branch name if no branch type input
         branch_name: String,
+        branch_type: Option<String>,
     },
     /// finish a task
     Finish {
-        branch_type: String,
+        /// input full branch name if no branch type input
         branch_name: String,
+        branch_type: Option<String>,
     },
     /// drop a task
     Drop {
-        branch_type: String,
+        /// input full branch name if no branch type input
         branch_name: String,
+        branch_type: Option<String>,
     },
     /// track a task
     Track {
-        branch_type: String,
+        /// input full branch name if no branch type input
         branch_name: String,
+        branch_type: Option<String>,
     },
     /// sync branches
     Sync {
         target: SyncTarget,
+        /// default is increment
         strategy: Option<SyncStrategy>,
     },
     /// list avaliable branch types
