@@ -1,12 +1,12 @@
 [[branch_types]]
 name = "feature"
-create = "feature/{new_branch}"
+create = "feature/{BRANCH_NAME}"
 from = "dev"
 to = [{ name = "dev", strategy = "merge" }]
 
 [[branch_types]]
 name = "hotfix"
-create = "hotfix/{new_branch}"
+create = "hotfix/{BRANCH_NAME}"
 from = "main"
 to = [
   { name = "main", strategy = "merge" },
