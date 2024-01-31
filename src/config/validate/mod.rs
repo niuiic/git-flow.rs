@@ -1,7 +1,7 @@
 use anyhow::{bail, Result};
 use regex::Regex;
 
-use super::definition::Config;
+use super::definition::{Config, BRANCH_NAME_PLACEHOLDER};
 
 #[cfg(test)]
 mod test;
@@ -66,7 +66,7 @@ fn create_is_valid(config: &Config) -> Result<()> {
         .iter()
         .filter(|x| {
             x.create
-                .match_indices("{new_branch}")
+                .match_indices(BRANCH_NAME_PLACEHOLDER)
                 .map(|x| x.1.to_string())
                 .collect::<Vec<String>>()
                 .len()
@@ -76,7 +76,11 @@ fn create_is_valid(config: &Config) -> Result<()> {
         .collect::<Vec<String>>();
 
     if invalid_creates.len() > 0 {
-        bail!("These branch_types have invalid 'create' which should include only one {{new_branch}}:\n{}", invalid_creates.join("\n"))
+        bail!(
+            "These branch_types have invalid 'create' which should include only one {}:\n{}",
+            BRANCH_NAME_PLACEHOLDER,
+            invalid_creates.join("\n")
+        )
     }
 
     Ok(())

@@ -39,3 +39,5 @@ pub struct Command {
     pub command: String,
     pub args: Vec<String>,
 }
+
+pub const BRANCH_NAME_PLACEHOLDER: &str = "{BRANCH_NAME}";
