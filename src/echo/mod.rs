@@ -36,7 +36,7 @@ impl Echo {
         tokio::spawn(async move {
             loop {
                 for spinner in &spinners {
-                    if let Ok(_) = rx.try_recv() {
+                    if rx.try_recv().is_ok() {
                         return;
                     }
 
@@ -48,10 +48,9 @@ impl Echo {
             }
         });
 
-        let stop = move || {
+        let finish = move || {
             tx.send(()).unwrap();
         };
-
-        Box::new(stop)
+        Box::new(finish)
     }
 }
