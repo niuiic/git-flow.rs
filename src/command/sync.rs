@@ -13,12 +13,16 @@ pub fn sync_repo_branches(target: SyncTarget, strategy: SyncStrategy) {
     let finish = Echo::progress("fetch remote data");
     let result = Git::fetch_remote_data();
     finish();
-    if let Err(err) = result {
-        println!();
-        Echo::error(err.to_string());
-        return;
+    match result {
+        Err(err) => {
+            println!();
+            Echo::error(err.to_string());
+            return;
+        }
+        Ok(_) => {
+            Echo::success("\rfetch remote data");
+        }
     }
-    Echo::success("\rfetch remote data");
 
     // -- select remote repo --
     let repo = match select_repo() {
@@ -115,16 +119,16 @@ fn sync_branches(
         if redundant_branches.len() == 0 {
             Echo::success("no redundant branches");
         } else {
-            let stop = Echo::progress("remove redundant branches");
+            let finish = Echo::progress("remove redundant branches");
             for branch in &redundant_branches {
                 if let Err(err) = del_branch(target, repo, branch) {
-                    stop();
+                    finish();
                     println!();
                     Echo::error(err.to_string());
                     return;
                 };
             }
-            stop();
+            finish();
             Echo::success(format!(
                 "\rremove redundant branches: {}",
                 &redundant_branches.join(", ")
@@ -143,16 +147,16 @@ fn sync_branches(
         return;
     }
 
-    let stop = Echo::progress("create missing branches");
+    let finish = Echo::progress("create missing branches");
     for branch in &missing_branches {
         if let Err(err) = create_branch(target, repo, branch) {
-            stop();
+            finish();
             println!();
             Echo::error(err.to_string());
             return;
         };
     }
-    stop();
+    finish();
     Echo::success(format!(
         "\rcreate missing branches: {}",
         &missing_branches.join(", ")
