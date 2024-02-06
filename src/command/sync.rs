@@ -12,15 +12,13 @@ pub fn sync_repo_branches(target: SyncTarget, strategy: SyncStrategy) {
     // -- fetch remote data --
     let finish = Echo::progress("fetch remote data");
     let result = Git::fetch_remote_data();
-    finish();
     match result {
         Err(err) => {
-            println!();
-            Echo::error(err.to_string());
+            finish(false, &err.to_string());
             return;
         }
         Ok(_) => {
-            Echo::success("\rfetch remote data");
+            finish(true, "fetch remote data");
         }
     }
 
@@ -122,17 +120,17 @@ fn sync_branches(
             let finish = Echo::progress("remove redundant branches");
             for branch in &redundant_branches {
                 if let Err(err) = del_branch(target, repo, branch) {
-                    finish();
-                    println!();
-                    Echo::error(err.to_string());
+                    finish(false, &err.to_string());
                     return;
                 };
             }
-            finish();
-            Echo::success(format!(
-                "\rremove redundant branches: {}",
-                &redundant_branches.join(", ")
-            ));
+            finish(
+                true,
+                &format!(
+                    "\rremove redundant branches: {}",
+                    &redundant_branches.join(", ")
+                ),
+            );
         }
     }
 
@@ -150,17 +148,17 @@ fn sync_branches(
     let finish = Echo::progress("create missing branches");
     for branch in &missing_branches {
         if let Err(err) = create_branch(target, repo, branch) {
-            finish();
-            println!();
-            Echo::error(err.to_string());
+            finish(false, &err.to_string());
             return;
         };
     }
-    finish();
-    Echo::success(format!(
-        "\rcreate missing branches: {}",
-        &missing_branches.join(", ")
-    ));
+    finish(
+        true,
+        &format!(
+            "\rcreate missing branches: {}",
+            &missing_branches.join(", ")
+        ),
+    );
 }
 
 fn del_branch(target: &SyncTarget, repo: &str, branch: &str) -> Result<()> {
