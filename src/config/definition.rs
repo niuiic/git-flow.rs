@@ -2,7 +2,6 @@ use serde::Deserialize;
 
 #[derive(Debug, Deserialize, Clone)]
 pub struct Config {
-    pub timeout: Option<u64>,
     pub branch_types: Vec<BranchType>,
 }
 
