@@ -21,39 +21,29 @@ Or download released binary.
 > Make sure that you have installed git.
 
 ```
-Extensible git flow written in rust.
+Usage: git-flow [OPTIONS] <COMMAND>
 
-Usage: git flow <command>
+Commands:
+  start   start a task
+  finish  finish a task
+  drop    drop a task
+  track   track a task
+  sync    sync branches
+  list    list avaliable branch types
+  check   check config
+  help    Print this message or the help of the given subcommand(s)
 
-Avaliable commands:
-
--h, --help
-	Print help
--v, --version
-	Print version
-start (<branch_type> <branch_name>)/(<full_branch_name>)
-	start a task
-finish (<branch_type> <branch_name>)/(<full_branch_name>)
-	finish a task
-drop (<branch_type> <branch_name>)/(<full_branch_name>)
-	give up a task
-track (<branch_type> <branch_name>)/(<full_branch_name>)
-	track a task
-sync remote/local [--override]
-	sync branches to remote/local
-
-Configured branch types:
-
-feature
-	from dev to dev
-...
+Options:
+  -c, --config <FILE>
+  -h, --help           Print help
+  -V, --version        Print version
 ```
 
 A small example.
 
 ```sh
 # start a feature
-git flow start feature something
+git flow start something feature
 # or git flow start feature/something
 # then branch feature/something created from dev
 
@@ -67,85 +57,58 @@ git flow finish feature/something
 
 ## Config
 
-Global config file should be located at `~/.config/git-flow/.git-flow.json`(or `C:\Users\YourUsername\AppData\Roaming\git-flow\.git-flow.json` on windows).
+Global config file should be located at `~/.config/git-flow/config.toml`(or `C:\Users\YourUsername\AppData\Roaming\git-flow\config.toml` on windows).
 
-Local config file should be located at `<GitRoot>/.git-flow.json`.
+Local config file should be located at `<GitRoot>/.git-flow.toml`.
 
 There is no default configuration. Here is an example.
 
 > Avaliable strategy: `merge`, `rebase`, `cherry-pick`.
 
-> Avaliable hook: `before_start`, `after_start`, `before_finish`, `after_finish`.
+> Avaliable hook: `before_start`, `after_start`, `before_finish`, `after_finish`, `before_drop`, `after_drop`.
 
-> Regex is avaliable on `to.n.branch`.
+> Regex is avaliable on `to.n.name`.
 
-```json
-[
-  {
-    "type": "feature",
-    "name": "feature/{new_branch}",
-    "from": "dev",
-    "to": [
-      {
-        "branch": "dev",
-        "strategy": "merge"
-      }
-    ],
-    "hooks": {
-      "after_start": {
-        "command": "git",
-        "args": ["push", "origin", "feature/{new_branch}:feature/{new_branch}"]
-      },
-      "after_finish": {
-        "command": "git",
-        "args": ["push", "origin", "--delete", "feature/{new_branch}"]
-      }
-    }
-  },
-  {
-    "type": "hotfix",
-    "name": "hotfix/{new_branch}",
-    "from": "main",
-    "to": [
-      {
-        "branch": "main",
-        "strategy": "merge"
-      },
-      {
-        "branch": "dev",
-        "strategy": "merge"
-      },
-      {
-        "branch": "feature/*",
-        "strategy": "merge"
-      }
-    ]
-  },
-  {
-    "type": "bugfix",
-    "name": "bugfix/{new_branch}",
-    "from": "dev",
-    "to": [
-      {
-        "branch": "dev",
-        "strategy": "merge"
-      },
-      {
-        "branch": "feature/*",
-        "strategy": "merge"
-      }
-    ]
-  },
-  {
-    "type": "release",
-    "name": "release/{new_branch}",
-    "from": "dev",
-    "to": [
-      {
-        "branch": "main",
-        "strategy": "merge"
-      }
-    ]
-  }
+```toml
+[[branch_types]]
+name = "feature"
+create = "feature/{NAME}"
+from = "dev"
+to = [{ name = "dev", strategy = "merge" }]
+after_start = { command = "git", args = [
+  "push",
+  "origin",
+  "feature/{NAME}:feature/{NAME}",
+] }
+after_finish = { command = "git", args = [
+  "push",
+  "origin",
+  "--delete",
+  "feature/{NAME}",
+] }
+
+[[branch_types]]
+name = "hotfix"
+create = "hotfix/{NAME}"
+from = "main"
+to = [
+  { name = "main", strategy = "merge" },
+  { name = "dev", strategy = "merge" },
+  { name = "feature/*", strategy = "merge" },
 ]
+
+[[branch_types]]
+name = "bugfix"
+create = "bugfix/{NAME}"
+from = "dev"
+to = [
+  { name = "dev", strategy = "merge" },
+  { name = "feature/*", strategy = "merge" },
+]
+
+[[branch_types]]
+name = "release"
+create = "release/{NAME}"
+from = "dev"
+to = [{ name = "main", strategy = "merge" }]
 ```
