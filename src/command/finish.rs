@@ -54,13 +54,13 @@ pub fn finish_task(branch_name: String, branch_type: BranchType) {
     }
 
     // -- delete branch --
-    let finish = Echo::progress(format!("switch to new branch {}", &branch_name));
-    match Git::switch(&branch_name) {
+    let finish = Echo::progress(format!("delete branch {}", &branch_name));
+    match Git::del_local_branch(&branch_name) {
         Err(err) => {
             finish(false, &err.to_string());
             return;
         }
-        Ok(_) => finish(true, &format!("switch to new branch {}", &branch_name)),
+        Ok(_) => finish(true, &format!("delete branch {}", &branch_name)),
     }
 
     // -- run after finish hook --
