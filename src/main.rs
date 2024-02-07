@@ -1,13 +1,14 @@
 use clap::Parser;
 use cli::{Args, Command};
 use echo::Echo;
-use git::Git;
+use utils::{env_valid, get_branch_type_name};
 
 mod cli;
 mod command;
 mod config;
 mod echo;
 mod git;
+mod utils;
 
 #[tokio::main]
 async fn main() {
@@ -26,20 +27,21 @@ async fn main() {
                 strategy.clone().unwrap_or(cli::SyncStrategy::Increment),
             );
         }
+        Command::Start {
+            branch_name,
+            branch_type,
+        } => {
+            if !env_valid() {
+                return;
+            }
+
+            match get_branch_type_name(branch_name.clone(), branch_type.clone(), args.config) {
+                Err(err) => Echo::error(err.to_string()),
+                Ok((branch_name, branch_type)) => {
+                    command::start::start_task(branch_name, branch_type);
+                }
+            }
+        }
         _ => {}
     }
-}
-
-fn env_valid() -> bool {
-    if !Git::git_installed() {
-        Echo::error("git command is not found");
-        return false;
-    }
-
-    if !Git::in_git_project() {
-        Echo::error("not in a git project");
-        return false;
-    }
-
-    true
 }
