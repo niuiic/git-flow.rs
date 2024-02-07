@@ -68,14 +68,23 @@ pub fn get_branch_type_name(
     }
 }
 
-pub fn run_hook(command: Option<Command>) -> Result<()> {
+pub fn run_hook(command: Option<Command>, branch_name: &str) -> Result<()> {
     let command = match command {
         Some(command_v) => command_v,
         None => return Ok(()),
     };
 
     // -- print start --
-    let msg = format!("Run hook: {} {}", command.command, command.args.join(" "));
+    let msg = format!(
+        "Run hook: {} {}",
+        command.command,
+        command
+            .args
+            .iter()
+            .map(|x| x.replace(BRANCH_NAME_PLACEHOLDER, branch_name).to_string())
+            .collect::<Vec<String>>()
+            .join(" ")
+    );
     let finish = Echo::progress(&msg);
 
     // -- run --
