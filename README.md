@@ -18,7 +18,7 @@ Or download released binary.
 
 `git flow --help`
 
-> Make sure that you have installed git.
+> Make sure that git command has been installed.
 
 ```
 Usage: git-flow [OPTIONS] <COMMAND>
