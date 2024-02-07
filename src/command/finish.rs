@@ -23,7 +23,13 @@ pub fn finish_task(branch_name: String, branch_type: BranchType) {
     }
 
     // -- run before finish hook --
-    if run_hook(branch_type.before_finish.clone(), &branch_name).is_err() {
+    if run_hook(
+        branch_type.before_finish.clone(),
+        &branch_name,
+        &branch_type,
+    )
+    .is_err()
+    {
         return;
     }
 
@@ -58,7 +64,7 @@ pub fn finish_task(branch_name: String, branch_type: BranchType) {
     }
 
     // -- run after finish hook --
-    let _ = run_hook(branch_type.after_finish.clone(), &branch_name);
+    let _ = run_hook(branch_type.after_finish.clone(), &branch_name, &branch_type);
 }
 
 fn resolve_target_branches(branch_name: &str, target_branches: &Vec<TargetBranch>) -> Result<()> {

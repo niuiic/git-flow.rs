@@ -68,29 +68,37 @@ pub fn get_branch_type_name(
     }
 }
 
-pub fn run_hook(command: Option<Command>, branch_name: &str) -> Result<()> {
+pub fn run_hook(
+    command: Option<Command>,
+    branch_name: &str,
+    branch_type: &BranchType,
+) -> Result<()> {
     let command = match command {
         Some(command_v) => command_v,
         None => return Ok(()),
     };
 
     // -- print start --
-    let msg = format!(
-        "Run hook: {} {}",
-        command.command,
-        command
-            .args
-            .iter()
-            .map(|x| x.replace(BRANCH_NAME_PLACEHOLDER, branch_name).to_string())
-            .collect::<Vec<String>>()
-            .join(" ")
-    );
+    let regex = Regex::new(&branch_type.create.replace(BRANCH_NAME_PLACEHOLDER, "(.*)")).unwrap();
+    let short_branch_name = match regex.captures(branch_name) {
+        None => None,
+        Some(captures) => captures.get(1),
+    };
+    let args = command
+        .args
+        .iter()
+        .map(|x| match short_branch_name {
+            Some(name) => x
+                .replace(BRANCH_NAME_PLACEHOLDER, name.as_str())
+                .to_string(),
+            None => x.to_string(),
+        })
+        .collect::<Vec<String>>();
+    let msg = format!("Run hook: {} {}", command.command, args.join(" "));
     let finish = Echo::progress(&msg);
 
     // -- run --
-    let result = process::Command::new(command.command)
-        .args(command.args)
-        .output();
+    let result = process::Command::new(command.command).args(args).output();
 
     // -- print result --
     let output = match result {
