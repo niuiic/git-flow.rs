@@ -72,6 +72,20 @@ async fn main() {
                 }
             }
         }
-        _ => {}
+        Command::Track {
+            branch_name,
+            branch_type,
+        } => {
+            if !env_valid() {
+                return;
+            }
+
+            match get_branch_type_name(branch_name.clone(), branch_type.clone(), args.config) {
+                Err(err) => Echo::error(err.to_string()),
+                Ok((branch_name, branch_type)) => {
+                    command::track::track_task(branch_name, branch_type);
+                }
+            }
+        }
     }
 }

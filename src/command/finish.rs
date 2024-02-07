@@ -128,7 +128,13 @@ fn rebase(source_branch: &str, target_branch: &str) -> Result<()> {
 
 fn cherry_pick(source_branch: &str, target_branch: &str) -> Result<()> {
     // -- get diff commits --
-    let commits = Git::diff_commits(source_branch, target_branch).unwrap();
+    let commits = match Git::diff_commits(source_branch, target_branch) {
+        Err(err) => {
+            Echo::error(err.to_string());
+            bail!("");
+        }
+        Ok(commits_v) => commits_v,
+    };
     if commits.len() == 0 {
         Echo::success(&format!("no commits to cherry pick to {}", target_branch));
         return Ok(());
