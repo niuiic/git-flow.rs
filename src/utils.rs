@@ -78,22 +78,24 @@ pub fn run_hook(
         None => return Ok(()),
     };
 
-    // -- print start --
+    // -- map args --
     let regex = Regex::new(&branch_type.create.replace(BRANCH_NAME_PLACEHOLDER, "(.*)")).unwrap();
     let short_branch_name = match regex.captures(branch_name) {
         None => None,
         Some(captures) => captures.get(1),
     };
-    let args = command
-        .args
-        .iter()
-        .map(|x| match short_branch_name {
-            Some(name) => x
-                .replace(BRANCH_NAME_PLACEHOLDER, name.as_str())
-                .to_string(),
-            None => x.to_string(),
-        })
-        .collect::<Vec<String>>();
+    let args = match short_branch_name {
+        None => command.args,
+        Some(name) => command
+            .args
+            .iter()
+            .map(|x| {
+                x.replace(BRANCH_NAME_PLACEHOLDER, name.as_str())
+                    .to_string()
+            })
+            .collect::<Vec<String>>(),
+    };
+
     let msg = format!("Run hook: {} {}", command.command, args.join(" "));
     let finish = Echo::progress(&msg);
 
