@@ -2,7 +2,10 @@ use std::path::PathBuf;
 
 use tabled::{Table, Tabled};
 
-use crate::{config::read::read_config, echo::Echo};
+use crate::{
+    config::{definition::Command, read::read_config},
+    echo::Echo,
+};
 
 #[derive(Tabled)]
 struct BranchType {
@@ -10,6 +13,12 @@ struct BranchType {
     create: String,
     from: String,
     to: String,
+    before_start: String,
+    after_start: String,
+    before_finish: String,
+    after_finish: String,
+    before_drop: String,
+    after_drop: String,
 }
 
 pub fn list_branch_types(config_path: Option<PathBuf>) {
@@ -38,9 +47,22 @@ pub fn list_branch_types(config_path: Option<PathBuf>) {
                         .map(|y| y.name.clone())
                         .collect::<Vec<String>>()
                         .join(", "),
+                    before_start: command_to_string(x.before_start.clone()),
+                    after_start: command_to_string(x.after_start.clone()),
+                    before_finish: command_to_string(x.before_finish.clone()),
+                    after_finish: command_to_string(x.after_finish.clone()),
+                    before_drop: command_to_string(x.before_drop.clone()),
+                    after_drop: command_to_string(x.after_drop.clone()),
                 })
                 .collect();
             println!("{}", Table::new(branch_types).to_string())
         }
+    }
+}
+
+fn command_to_string(command: Option<Command>) -> String {
+    match command {
+        None => String::new(),
+        Some(command_v) => format!("{} {}", command_v.command, command_v.args.join(" ")),
     }
 }
