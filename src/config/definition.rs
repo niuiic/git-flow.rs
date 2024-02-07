@@ -15,6 +15,8 @@ pub struct BranchType {
     pub after_start: Option<Command>,
     pub before_finish: Option<Command>,
     pub after_finish: Option<Command>,
+    pub before_drop: Option<Command>,
+    pub after_drop: Option<Command>,
 }
 
 #[derive(Debug, Deserialize, Clone)]

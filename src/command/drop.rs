@@ -1,4 +1,4 @@
-use crate::{config::definition::BranchType, echo::Echo, git::Git};
+use crate::{config::definition::BranchType, echo::Echo, git::Git, utils::run_hook};
 
 pub fn drop_task(branch_name: String, branch_type: BranchType) {
     // -- validate branches --
@@ -11,6 +11,11 @@ pub fn drop_task(branch_name: String, branch_type: BranchType) {
     };
     if branches.iter().all(|x| x.as_str() != branch_name) {
         Echo::error(format!("target branch {} not found", branch_name));
+        return;
+    }
+
+    // -- run before drop hook --
+    if run_hook(branch_type.before_drop.clone(), &branch_name, &branch_type).is_err() {
         return;
     }
 
@@ -33,4 +38,7 @@ pub fn drop_task(branch_name: String, branch_type: BranchType) {
         }
         Ok(_) => finish(true, &format!("delete branch {}", &branch_name)),
     }
+
+    // -- run after drop hook --
+    let _ = run_hook(branch_type.after_drop.clone(), &branch_name, &branch_type);
 }
