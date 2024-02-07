@@ -12,5 +12,5 @@ async fn echo_t() {
     })
     .await
     .unwrap();
-    finish();
+    finish(true, "hello");
 }
