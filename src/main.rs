@@ -15,8 +15,8 @@ async fn main() {
     let args = Args::parse();
 
     match &args.command {
-        Command::List => command::list::list_branch_types(args.config.clone()),
-        Command::Check => command::check::check_config(args.config.clone()),
+        Command::List => command::list::list_branch_types(args.config),
+        Command::Check => command::check::check_config(args.config),
         Command::Sync { target, strategy } => {
             if !env_valid() {
                 return;
