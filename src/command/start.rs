@@ -19,7 +19,7 @@ pub fn start_task(branch_name: String, branch_type: BranchType) {
     }
 
     // -- run before start hook --
-    if let Err(_) = run_hook(branch_type.before_start.clone()) {
+    if run_hook(branch_type.before_start.clone()).is_err() {
         return;
     }
 
