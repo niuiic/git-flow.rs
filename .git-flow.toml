@@ -3,6 +3,17 @@ name = "feature"
 create = "feature/{NAME}"
 from = "dev"
 to = [{ name = "dev", strategy = "merge" }]
+after_start = { command = "git", args = [
+  "push",
+  "origin",
+  "feature/{NAME}:feature/{NAME}",
+] }
+after_finish = { command = "git", args = [
+  "push",
+  "origin",
+  "--delete",
+  "feature/{NAME}",
+] }
 
 [[branch_types]]
 name = "hotfix"
@@ -13,3 +24,18 @@ to = [
   { name = "dev", strategy = "merge" },
   { name = "feature/*", strategy = "merge" },
 ]
+
+[[branch_types]]
+name = "bugfix"
+create = "bugfix/{NAME}"
+from = "dev"
+to = [
+  { name = "dev", strategy = "merge" },
+  { name = "feature/*", strategy = "merge" },
+]
+
+[[branch_types]]
+name = "release"
+create = "release/{NAME}"
+from = "dev"
+to = [{ name = "main", strategy = "merge" }]
