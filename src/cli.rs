@@ -47,7 +47,7 @@ pub enum Command {
     /// list avaliable branch types
     List,
     /// check config
-    Check,
+    Check { file_path: PathBuf },
 }
 
 #[derive(Debug, Clone, ValueEnum)]
