@@ -22,3 +22,4 @@ tokio = { version = "1.36", features = ["full"] }
 clap = { version = "4.5", features = ["derive"] }
 toml = "0.8"
 tabled = "0.15.0"
+terminal_size = "0.3.0"

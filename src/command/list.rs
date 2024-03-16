@@ -1,6 +1,11 @@
 use std::path::PathBuf;
 
-use tabled::{Table, Tabled};
+use anyhow::{Context, Result};
+use tabled::{
+    settings::{peaker::PriorityMax, Width},
+    Table, Tabled,
+};
+use terminal_size::{terminal_size, Height as TerminalHeight, Width as TerminalWidth};
 
 use crate::{
     config::{definition::Command, read::read_config},
@@ -55,7 +60,21 @@ pub fn list_branch_types(config_path: Option<PathBuf>) {
                     after_drop: command_to_string(x.after_drop.clone()),
                 })
                 .collect();
-            println!("{}", Table::new(branch_types).to_string())
+
+            let width = match get_terminal_size() {
+                Err(_) => {
+                    Echo::error("unable to get terminal size");
+                    return;
+                }
+                Ok(size) => size.0,
+            };
+            println!(
+                "{}",
+                Table::new(branch_types)
+                    .with(Width::wrap(width).priority::<PriorityMax>())
+                    .with(Width::increase(width))
+                    .to_string()
+            )
         }
     }
 }
@@ -65,4 +84,10 @@ fn command_to_string(command: Option<Command>) -> String {
         None => String::new(),
         Some(command_v) => format!("{} {}", command_v.command, command_v.args.join(" ")),
     }
+}
+
+fn get_terminal_size() -> Result<(usize, usize)> {
+    let (TerminalWidth(width), TerminalHeight(height)) = terminal_size().context("unable")?;
+
+    Ok((width as usize, height as usize))
 }
