@@ -1,6 +1,6 @@
 use std::{env, path::PathBuf};
 
-use anyhow::{anyhow, bail, Result};
+use anyhow::{anyhow, Result};
 
 #[cfg(test)]
 mod test;
@@ -31,7 +31,7 @@ fn get_local_config_path() -> Result<PathBuf> {
         cur_dir.pop();
     }
 
-    bail!("git root is not found")
+    Ok(cur_dir)
 }
 
 pub fn get_config_path_list() -> Result<Vec<PathBuf>> {
