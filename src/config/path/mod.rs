@@ -31,7 +31,7 @@ fn get_local_config_path() -> Result<PathBuf> {
         cur_dir.pop();
     }
 
-    Ok(cur_dir)
+    Ok(cur_dir.join(".git-flow.toml"))
 }
 
 pub fn get_config_path_list() -> Result<Vec<PathBuf>> {
